@@ -5,8 +5,12 @@ using System.Linq;
 
 public class WorldController : MonoBehaviour {
 
+	/// <summary>
+	/// Used to ensure that only one instance of WorldController has been created.
+	/// </summary>
 	public static WorldController Instance { get; protected set; }
 
+	//TODO: make this more concise, an enum, perhaps?
 	public Sprite sp_Empty; 
 	public Sprite sp_Water;
 	public Sprite sp_Grass;
@@ -17,8 +21,15 @@ public class WorldController : MonoBehaviour {
 	public Sprite sp_Snow;
 	public Sprite sp_Marsh;
 
+	/// <summary>
+	/// Gets or sets the world.
+	/// </summary>
+	/// <value>The world map.  This might be changed later to access a list of levels in the map.</value>
 	public World World { get; protected set; }
 
+	/// <summary>
+	/// A map of Tiles in a world to their associated GameObjects used for rendering
+	/// </summary>
 	Dictionary<Tile, GameObject> map_Tile2GameObject;
 
 	// Use this for initialization
@@ -28,6 +39,7 @@ public class WorldController : MonoBehaviour {
 		if(Instance != null) { Debug.LogError ("WorldController has been instantiated more than once."); }
 		Instance = this;
 
+		// Make a new map
 		World = new World();
 
 		// Instantiate the currentLayer Dictionary
@@ -47,6 +59,12 @@ public class WorldController : MonoBehaviour {
 	}
 
 	// Query Functions
+
+	/// <summary>
+	/// Gets the tile at the Unity world coordinate.
+	/// </summary>
+	/// <returns>The tile at world coordinate.</returns>
+	/// <param name="coord">The position under which to find a tile</param>
 	public Tile GetTileAtWorldCoord(Vector3 coord) {
 		int x = Mathf.FloorToInt (coord.x+0.5f);
 		int y = Mathf.FloorToInt (coord.y+0.5f);
@@ -56,7 +74,10 @@ public class WorldController : MonoBehaviour {
 
 	// Callback Functions
 
-	// Changes the Tile's associated GameObject to render correctly
+	/// <summary>
+	/// Changes the Tile's associated GameObject to render correctly when its type is changed.
+	/// </summary>
+	/// <param name="tile_data">The Tile which type has been changed.</param>
 	void OnTileTypeChanged(Tile tile_data) {
 
 		// Sanity Check
@@ -65,14 +86,17 @@ public class WorldController : MonoBehaviour {
 			return;
 		}
 
+		// Find the Tile's GameObject
 		GameObject tile_go = map_Tile2GameObject [tile_data];
 
+		// Sanity Check
 		if (tile_go == null) {
 			Debug.LogError ("WorldController.OnTiletypeChanged - This function has been called from a Tile that has no associated GameObject.");
 			return;
 		}
 			
 		//TODO: switch case
+		// Change the Tile's GameObject to render the correct sprite for the TileType
 		if (tile_data.Type == Tile.TileType.Empty) {
 			tile_go.GetComponent<SpriteRenderer> ().sprite = null;
 		} else if (tile_data.Type == Tile.TileType.Water) {
@@ -101,6 +125,13 @@ public class WorldController : MonoBehaviour {
 
 	// Internal Functions
 
+	/// <summary>
+	/// Creates GameObjects for each Tile in the World,
+	/// Places those GameObjects in the correct position,
+	/// Adds a SpriteRenderer,
+	/// Registers the necessary callback functions,
+	/// and Stashes the relationship between the Tile and it's GameObject in the local map_Tile2GameObject.
+	/// </summary>
 	void InstantiateTiles() {
 		for (int w = 0; w < World.Width; w++) {
 			for (int h = 0; h < World.Height; h++) {

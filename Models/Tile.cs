@@ -4,14 +4,31 @@ using System.Collections.Generic;
 
 public class Tile  {
 
-	public enum TileType      {          Empty, Water, Grass, Desert, Plains, Rough, Lava, Snow, Marsh };
-	static List<float> moveCost = new List<float>(){ Int32.MaxValue,    2f,    1f,   1.2f,   1.2f,  1.5f,   2f,   2f,    2f };
+	/// <summary>
+	/// Available base terrain types.
+	/// </summary>
+	public enum TileType                           { Empty, Water, Grass, Desert, Plains, Rough, Lava, Snow, Marsh };
+	/// <summary>
+	/// The base move cost of each terrain type.
+	/// </summary>
+	static List<float> moveCost = new List<float>(){     0,    5f,    1f,   1.2f,   1.2f,  1.5f,   2f,   2f,    2f };
 
-
+	/// <summary>
+	/// The base terrain type of the tile.
+	/// </summary>
 	TileType type = TileType.Empty;
 
+	/// <summary>
+	/// Container for callback functions that should be called when the tile type changes
+	/// These are registered by the caller, who is also responsible for unregistering them before destroying the tile
+	/// </summary>
 	Action<Tile> cb_TileTypeChanged;
 
+	/// <summary>
+	/// Gets or sets the base terrain type of the Tile.  If any render layer modifications need to be made as a 
+	/// result of changing this value, they should be registered as a callback function
+	/// </summary>
+	/// <value>The type.</value>
 	public TileType Type {
 		get { return type; }
 		set { 
@@ -23,6 +40,12 @@ public class Tile  {
 		}
 	}
 
+	//TODO: make this dependent on modifiers from InstalledObjects and LooseObjects
+	/// <summary>
+	/// Returns the total move cost of the tile, including all object-based modifiers.  Player-based modifiers should be 
+	/// handled by the caller.
+	/// </summary>
+	/// <value>The move cost.</value>
 	public float MoveCost { get { return moveCost[(int)type]; } }
 
 	LooseObject looseObject;
@@ -34,20 +57,41 @@ public class Tile  {
 
 	int x;
 	int y;
-
+	//TODO: restructure this class so that X and Y supplant x and y
+	/// <summary>
+	/// Returns the x coordinate of the Tile.
+	/// </summary>
 	public int X { get { return x; } }
+	/// <summary>
+	/// Returns the y coordinate of the Tile.
+	/// </summary>
 	public int Y { get { return y; } }
 
+	/// <summary>
+	/// Initializes a new instance of the <see cref="Tile"/> class.
+	/// </summary>
+	/// <param name="world">The World representing the layer/map in which the Tile resides</param>
+	/// <param name="x">The x coordinate - 0-Indexed.</param>
+	/// <param name="y">The y coordinate - 0-Indexed.</param>
 	public Tile(World world, int x, int y) {
 		this.world = world;
 		this.x = x;
 		this.y = y;
 	}
 
+	/// <summary>
+	/// Registers a callback function to be run when the TileType is changed.
+	/// </summary>
+	/// <param name="cbfun">A function of the form foo(Tile tile).</param>
 	public void RegisterCB_OnTileTypeChanged(Action<Tile> cbfun) {
 		cb_TileTypeChanged += cbfun;
 	}
 
+	//TODO: log a warning when this is called on a function that is not in cb_TileTypeChanged
+	/// <summary>
+	/// Unregisters a callback function to be run when the TileType is changed.
+	/// </summary>
+	/// <param name="cbfun">A function of the form foo(Tile tile).</param>
 	public void UnregisterCB_OnTileTypeChanged(Action<Tile> cbfun) {
 		cb_TileTypeChanged -= cbfun;
 	}

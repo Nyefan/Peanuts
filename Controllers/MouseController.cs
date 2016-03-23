@@ -5,26 +5,50 @@ using System.Collections.Generic;
 
 public class MouseController : MonoBehaviour {
 
+	/// <summary>
+	/// The selection box prefab - this is set through Unity.
+	/// </summary>
 	public GameObject selectionBoxPrefab;
 
+	// Flags used for adjusting the behavior of the editor
 	bool          buildModeIsInstalledObject = false;
 	bool          buildModeIsLooseObject = false;
+
+	/// <summary>
+	/// The current TileType to be painted while in build mode.  Defaults to Grass.
+	/// </summary>
 	Tile.TileType buildModeType = Tile.TileType.Grass;
 
+	// Camera positions used for dragging and selecting objects
 	Vector3 lastFramePosition;
 	Vector3 currentFramePosition;
 
+	/// <summary>
+	/// The point at which the mouse was originally clicked when dragging in build mode.
+	/// </summary>
 	Vector3 bandSelectionBoxStartPosition;
+
+	/// <summary>
+	/// Flag used to disable dragging and building when clicking over a UI element.
+	/// </summary>
 	bool noDragFlag = false;
+
+	/// <summary>
+	/// A local record of the currently displayed selection box graphics.
+	/// </summary>
 	List<GameObject> selectionBoxInstances;
 
-	// Use this for initialization
+	/// <summary>
+	/// Start this instance.
+	/// </summary>
 	void Start () {
 		// Keep a record of currently used selection boxes
 		selectionBoxInstances = new List<GameObject> ();
 	}
 	
-	// Update is called once per frame
+	/// <summary>
+	/// Update this instance - called once per frame.
+	/// </summary>
 	void Update () {
 		currentFramePosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
 		currentFramePosition.z = 0;
@@ -36,6 +60,12 @@ public class MouseController : MonoBehaviour {
 		lastFramePosition.z = 0;
 	}
 
+	//TODO: once editor and gameplay modes are separate, check for the editor flag before doing anything
+	//TODO: alter this to work as expected when the build mode is not set to Tile
+	/// <summary>
+	/// Handles the creation, destruction, and alteration of the selection box graphic and selected tiles
+	/// while in editor mode.
+	/// </summary>
 	void UpdateDragging () {
 		
 		// Determine whether we should start a selection box
@@ -94,8 +124,10 @@ public class MouseController : MonoBehaviour {
 			}
 		}
 	}
-
-	//Drag the screen when middle mouse is held down
+		
+	/// <summary>
+	/// Updates the camera - currently this just drags the screen when middle mouse is held down.
+	/// </summary>
 	void UpdateCamera () {
 		if (Input.GetMouseButton(2)) { // 2 = middle mouse button
 			Vector3 diff = lastFramePosition - currentFramePosition;
@@ -103,7 +135,7 @@ public class MouseController : MonoBehaviour {
 		}
 
 		Camera.main.orthographicSize -= Camera.main.orthographicSize * Input.GetAxis("Mouse ScrollWheel") * 3;
-		Camera.main.orthographicSize = Mathf.Clamp (Camera.main.orthographicSize, 3f, 25f);
+		Camera.main.orthographicSize = Mathf.Clamp (Camera.main.orthographicSize, 3f, 20f);
 	}
 
 	// Setter functions for build that don't rely on user knowing what types are valid
@@ -152,22 +184,32 @@ public class MouseController : MonoBehaviour {
 	// These three functions set the build mode more concisely
 
 	// Installed Object
+	/// <summary>
+	/// Sets the build mode to work with InstalledObjects.
+	/// </summary>
 	void SetBuildMode_IO() { 
 		bool buildModeIsInstalledObject = true;
 		bool buildModeIsLooseObject = false;
 	}
 
 	// LooseObject
+	/// <summary>
+	/// Sets the build mode to work with LooseObjects.
+	/// </summary>
 	void SetBuildMode_LO() {
 		bool buildModeIsInstalledObject = false;
 		bool buildModeIsLooseObject = true;
 	}
 
 	// Tile
+	/// <summary>
+	/// Sets the build mode to work with Tiles.
+	/// </summary>
 	void SetBuildMode_T() {
 		bool buildModeIsInstalledObject = false;
 		bool buildModeIsLooseObject = false;
 	}
+
 	// Why isn't this included in the base language?
 	void Swap<T> (ref T l, ref T r) { T t = l; l = r; r = t; }
 }
