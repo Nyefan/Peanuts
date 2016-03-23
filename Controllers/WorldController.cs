@@ -71,14 +71,31 @@ public class WorldController : MonoBehaviour {
 			Debug.LogError ("WorldController.OnTiletypeChanged - This function has been called from a Tile that has no associated GameObject.");
 			return;
 		}
-
-
-		if (tile_data.Type == Tile.TileType.Grass) {
-			tile_go.GetComponent<SpriteRenderer>().sprite = sp_Grass;
-		} else if (tile_data.Type == Tile.TileType.Empty) {
-			tile_go.GetComponent<SpriteRenderer>().sprite = null;
+			
+		//TODO: switch case
+		if (tile_data.Type == Tile.TileType.Empty) {
+			tile_go.GetComponent<SpriteRenderer> ().sprite = null;
+		} else if (tile_data.Type == Tile.TileType.Water) {
+			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Water;
+		} else if (tile_data.Type == Tile.TileType.Grass) {
+			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Grass;
+		} else if (tile_data.Type == Tile.TileType.Desert) {
+			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Desert;
+		} else if (tile_data.Type == Tile.TileType.Plains) {
+			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Plains;
+		} else if (tile_data.Type == Tile.TileType.Rough) {
+			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Rough;
+		} else if (tile_data.Type == Tile.TileType.Lava) {
+			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Lava;
+		} else if (tile_data.Type == Tile.TileType.Snow) {
+			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Snow;
+		} else if (tile_data.Type == Tile.TileType.Marsh) {
+			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Marsh;
 		} else {
-			Debug.LogError("WorldController.OnTiletypeChanged - Unrecognized tile type.");
+			Debug.LogError("WorldController.OnTiletypeChanged - Unrecognized tile type.  The Tile at ("+tile_data.X+","+tile_data.Y+") has defaulted to empty.");
+			tile_data.Type = Tile.TileType.Empty;
+			//This line shouldn't be necessary unless the callback system is changed
+			//tile_go.GetComponent<SpriteRenderer> ().sprite = null;
 		}
 	}
 
