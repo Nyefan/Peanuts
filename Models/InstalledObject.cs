@@ -25,8 +25,12 @@ public class InstalledObject {
 	/// </summary>
 	List<float> movementCost;
 
-	int width;
-	int height;
+	// The size of the InstalledObject, anchored to the bottom left
+	public int Width { get; protected set; }
+	public int Height { get; protected set; }
+
+	// Disallow instantiating InstalledObjects outside of this class or its children
+	protected InstalledObject() { }
 
 	//TODO: enforce global uniqueness of objectType OR change description
 	//TODO: once InstalledObjects handle their own sprites, log a warning when sprites are not the same size as
@@ -56,51 +60,60 @@ public class InstalledObject {
 	/// <param name="height">
 	/// The number of tiles high the InstalledObject should be.  This is 1-indexed.  Defaults to 1.
 	/// </param>
-	public InstalledObject( string objectType, List<float> movementCost, int width = 1, int height = 1 ) {
+	public static InstalledObject CreatePrototype( string objectType, List<float> movementCost, int width = 1, int height = 1 ) {
+
+		InstalledObject io = new InstalledObject ();
+
 		// If passed an empty list, make object unpathable
 		// else if the list length is unreconcileable with the width and height, log an error and make the object unpathable
 		if ( movementCost.Count == 0 ) {
-			this.movementCost = new List<float> ();
+			io.movementCost = new List<float> ();
 			for (int i = 0; i < width*height; i++) {
-				this.movementCost.Add (0f);
+				io.movementCost.Add (0f);
 			}
 		} else if ( movementCost.Count != width*height ) {
 			Debug.LogError ("InstalledObject Prototype Constructor for " + objectType + " has been called incorrectly.  Tiles are defaulting to be unpathable.");
-			this.movementCost = new List<float> ();
+			io.movementCost = new List<float> ();
 			for (int i = 0; i < width*height; i++) {
-				this.movementCost.Add (0f);
+				io.movementCost.Add (0f);
 			}
 		}
 
-		this.objectType = objectType;
-		this.width = width;
-		this.height = height;
+		io.objectType = objectType;
+		io.Width = width;
+		io.Height = height;
+		return io;
 	}
 
 	/// <summary>
-	/// Initializes a new instance of the <see cref="InstalledObject"/> class.
+	/// Places an instance of the prototype in the world.
 	/// </summary>
 	/// <param name="prototype">A properly instantiated prototype of the InstalledObject.  This is assumed to be correct. </param>
 	/// <param name="baseTile">The bottom left tile onto which this object is to be installed. </param>
-	public InstalledObject( InstalledObject prototype, Tile baseTile ) {
+	public static InstalledObject PlaceInstance( InstalledObject prototype, Tile baseTile ) {
+
+		InstalledObject io = new InstalledObject ();
+
 		// TODO: Consider whether it makes more sense to link these values to the prototype directly rather than to make copies.
 		// TODO: Look up whether strings are immutable in C#
-		objectType = prototype.objectType;
-		movementCost = new List<float> ();
-		movementCost.AddRange(prototype.movementCost);
-		width = prototype.width;
-		height = prototype.height;
+		io.objectType = prototype.objectType;
+		io.movementCost = new List<float> ();
+		io.movementCost.AddRange(prototype.movementCost);
+		io.Width = prototype.Width;
+		io.Height = prototype.Height;
 
-		tiles = new List<Tile> ();
+		io.tiles = new List<Tile> ();
 
 		// The base tile should be in the bottom left of the sprite/installed object
 		// List<Tile> tiles contains the tiles in order from left to right, bottom to top
-		for (int h = 0; h < height; h++) {
-			for (int w = 0; w < width; w++) {
+		for (int h = 0; h < io.Height; h++) {
+			for (int w = 0; w < io.Width; w++) {
 				// These lines are separate to add sanity checks and pathing requirements later
 				Tile t = baseTile.World.GetTileAt (baseTile.X + w, baseTile.Y + h);
-				tiles.Add (t);
+				io.tiles.Add (t);
 			}
 		}
+
+		return io;
 	}
 }

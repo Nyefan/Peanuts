@@ -89,7 +89,8 @@ public class MouseController : MonoBehaviour {
 		if (start_x > end_x) { Swap (ref start_x, ref end_x); }
 		if (start_y > end_y) { Swap (ref start_y, ref end_y); }
 
-		// Turn off all existing drag boxes - this should probably be changed once there is a more sophisticated map editing system
+		//TODO: Consider changing this once there is a more sophisticated map editing system
+		// Turn off all existing drag boxes prior to turning on the necessary ones next frame
 		while(selectionBoxInstances.Count > 0) {
 			GameObject go = selectionBoxInstances [0];
 			selectionBoxInstances.RemoveAt (0);

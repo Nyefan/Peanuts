@@ -51,21 +51,20 @@ public class Tile  {
 	LooseObject looseObject;
 	InstalledObject installedObject;
 
-	World world;
-	//TODO: restructure this class so that World supplants world
-	public World World { get { return world; } }
+	/// <summary>
+	/// Gets or sets the world.
+	/// </summary>
+	/// <value>The world (i.e. map/layer) that the Tile occupies.</value>
+	public World World { get; protected set; }
 
-	int x;
-	int y;
-	//TODO: restructure this class so that X and Y supplant x and y
 	/// <summary>
 	/// Returns the x coordinate of the Tile.
 	/// </summary>
-	public int X { get { return x; } }
+	public int X { get; protected set; }
 	/// <summary>
 	/// Returns the y coordinate of the Tile.
 	/// </summary>
-	public int Y { get { return y; } }
+	public int Y { get; protected set; }
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="Tile"/> class.
@@ -74,9 +73,9 @@ public class Tile  {
 	/// <param name="x">The x coordinate - 0-Indexed.</param>
 	/// <param name="y">The y coordinate - 0-Indexed.</param>
 	public Tile(World world, int x, int y) {
-		this.world = world;
-		this.x = x;
-		this.y = y;
+		this.World = world;
+		this.X = x;
+		this.Y = y;
 	}
 
 	/// <summary>
