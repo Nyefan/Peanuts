@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>
 /// This class contains and maintains a record all of the Tiles, InstalledObjects, and LooseObjects in a 
@@ -11,6 +13,9 @@ public class World {
 	/// The Map.
 	/// </summary>
 	Tile[,] tiles;
+
+	static Dictionary<string, InstalledObject> installedObjectPrototypes;
+	Action<InstalledObject> cb_InstalledObjectCreated;
 
 	/// <summary>
 	/// Gets or sets the width.
@@ -40,6 +45,33 @@ public class World {
 		}
 
 		Debug.Log ("World created with " + (Width * Height) + " tiles.");
+
+		CreateInstalledObjectPrototypes ();
+
+	}
+
+	// TODO: Set this up to read from an XML file (or some other data file)
+	void CreateInstalledObjectPrototypes() {
+		installedObjectPrototypes = new Dictionary<string, InstalledObject> ();
+
+		//Temporary code for figuring out how to structure everything
+		InstalledObject treesPrototype = InstalledObject.CreatePrototype("Trees", 0, 1, 1);
+		installedObjectPrototypes.Add ("Trees", treesPrototype);
+		Debug.Log ("InstalledObjectPrototype dictionary populated");
+	}
+
+	// TODO: this currently assumes 1x1 objects - fix that
+	public void PlaceInstalledObject(string objectType, Tile baseTile) {
+		if (!installedObjectPrototypes.ContainsKey(objectType)) {
+			Debug.LogError("MouseController.SetTilePainter_IO - The InstalledObject \"" + objectType + "\" has no prototype.");
+			return;
+		}
+
+		InstalledObject io = InstalledObject.PlaceInstance (installedObjectPrototypes[objectType], baseTile);
+
+		if(cb_InstalledObjectCreated != null) {
+			cb_InstalledObjectCreated (io);
+		}
 	}
 
 	/// <summary>
@@ -66,5 +98,13 @@ public class World {
 			return null;
 		}
 		return tiles [x, y];
+	}
+
+	public void RegisterCB_OnInstalledObjectCreated( Action<InstalledObject> cbfun ) {
+		cb_InstalledObjectCreated += cbfun;
+	}
+
+	public void UnregisterCB_OnInstalledObjectCreated( Action<InstalledObject> cbfun ) {
+		cb_InstalledObjectCreated -= cbfun;
 	}
 }

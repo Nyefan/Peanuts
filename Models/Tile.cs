@@ -14,15 +14,15 @@ public class Tile  {
 	static List<float> moveCost = new List<float>(){     0,    5f,    1f,   1.2f,   1.2f,  1.5f,   2f,   2f,    2f };
 
 	/// <summary>
-	/// The base terrain type of the tile.
-	/// </summary>
-	TileType type = TileType.Empty;
-
-	/// <summary>
 	/// Container for callback functions that should be called when the tile type changes
 	/// These are registered by the caller, who is also responsible for unregistering them before destroying the tile
 	/// </summary>
 	Action<Tile> cb_TileTypeChanged;
+
+	/// <summary>
+	/// The base terrain type of the tile.
+	/// </summary>
+	TileType type = TileType.Empty;
 
 	/// <summary>
 	/// Gets or sets the base terrain type of the Tile.  If any render layer modifications need to be made as a 
@@ -48,8 +48,22 @@ public class Tile  {
 	/// <value>The move cost.</value>
 	public float MoveCost { get { return moveCost[(int)type]; } }
 
-	LooseObject looseObject;
-	InstalledObject installedObject;
+	public InterractableObject InterractableObject { get; set; }
+
+	InstalledObject io;
+	public InstalledObject InstalledObject { 
+		get { return io; } 
+		set {
+			if(value == null) {
+				Debug.Log ("Removed InstalledObject " + io.ObjectType + " from Tile " + X + ", " + Y + ".");
+			} else if (io != null) {
+				Debug.LogWarning ("Tried to place InstalledObject" + value.ObjectType + " in a Tile that already has an installedObject.");
+			} else {
+				io = value;
+				Debug.Log ("InstalledObject " + value.ObjectType + " has been placed in Tile " + X + ", " + Y + ".");
+			}
+		} 
+	}
 
 	/// <summary>
 	/// Gets or sets the world.

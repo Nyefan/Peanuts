@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using System.Linq;
 
 
 public class MouseController : MonoBehaviour {
@@ -17,7 +18,9 @@ public class MouseController : MonoBehaviour {
 	/// <summary>
 	/// The current TileType to be painted while in build mode.  Defaults to Grass.
 	/// </summary>
-	Tile.TileType buildModeType = Tile.TileType.Grass;
+	Tile.TileType buildModeType_Tile = Tile.TileType.Grass;
+	string buildModeType_IO = null;
+
 
 	// Camera positions used for dragging and selecting objects
 	Vector3 lastFramePosition;
@@ -117,9 +120,13 @@ public class MouseController : MonoBehaviour {
 				for (int y = start_y; y <= end_y; y++) {
 					Tile t = WorldController.Instance.World.GetTileAt (x, y);
 					if(t != null) { 
-						if (t.Type != null) {
-							t.Type = buildModeType;
-						} 
+						if (buildModeIsInstalledObject) {
+							WorldController.Instance.World.PlaceInstalledObject (buildModeType_IO, t);
+						} else if (buildModeIsLooseObject) {
+							
+						} else {
+							t.Type = buildModeType_Tile;
+						}
 					}
 				}
 			}
@@ -145,39 +152,44 @@ public class MouseController : MonoBehaviour {
 	//	     but that allows the render layer to dictate the behaviour of the model layer
 	public void SetTilePainter_Empty() { 
 		SetBuildMode_T ();
-		buildModeType = Tile.TileType.Empty; 
+		buildModeType_Tile = Tile.TileType.Empty; 
 	}
 	public void SetTilePainter_Water() { 
 		SetBuildMode_T ();
-		buildModeType = Tile.TileType.Water; 
+		buildModeType_Tile = Tile.TileType.Water; 
 	}
 	public void SetTilePainter_Grass() { 
 		SetBuildMode_T ();
-		buildModeType = Tile.TileType.Grass; 
+		buildModeType_Tile = Tile.TileType.Grass; 
 	}
 	public void SetTilePainter_Desert() { 
 		SetBuildMode_T ();
-		buildModeType = Tile.TileType.Desert; 
+		buildModeType_Tile = Tile.TileType.Desert; 
 	}
 	public void SetTilePainter_Plains() { 
 		SetBuildMode_T ();
-		buildModeType = Tile.TileType.Plains; 
+		buildModeType_Tile = Tile.TileType.Plains; 
 	}
 	public void SetTilePainter_Rough() { 
 		SetBuildMode_T ();
-		buildModeType = Tile.TileType.Rough; 
+		buildModeType_Tile = Tile.TileType.Rough; 
 	}
 	public void SetTilePainter_Lava() { 
 		SetBuildMode_T ();
-		buildModeType = Tile.TileType.Lava; 
+		buildModeType_Tile = Tile.TileType.Lava; 
 	}
 	public void SetTilePainter_Snow() { 
 		SetBuildMode_T ();
-		buildModeType = Tile.TileType.Snow; 
+		buildModeType_Tile = Tile.TileType.Snow; 
 	}
 	public void SetTilePainter_Marsh() { 
 		SetBuildMode_T ();
-		buildModeType = Tile.TileType.Marsh; 
+		buildModeType_Tile = Tile.TileType.Marsh; 
+	}
+
+	public void SetTilePainter_IO(string objectType) {
+		SetBuildMode_IO ();
+		buildModeType_IO = objectType;
 	}
 
 	// Internal Functions
@@ -189,8 +201,8 @@ public class MouseController : MonoBehaviour {
 	/// Sets the build mode to work with InstalledObjects.
 	/// </summary>
 	void SetBuildMode_IO() { 
-		bool buildModeIsInstalledObject = true;
-		bool buildModeIsLooseObject = false;
+		buildModeIsInstalledObject = true;
+		buildModeIsLooseObject = false;
 	}
 
 	// LooseObject
@@ -198,8 +210,8 @@ public class MouseController : MonoBehaviour {
 	/// Sets the build mode to work with LooseObjects.
 	/// </summary>
 	void SetBuildMode_LO() {
-		bool buildModeIsInstalledObject = false;
-		bool buildModeIsLooseObject = true;
+		buildModeIsInstalledObject = false;
+		buildModeIsLooseObject = true;
 	}
 
 	// Tile
@@ -207,8 +219,8 @@ public class MouseController : MonoBehaviour {
 	/// Sets the build mode to work with Tiles.
 	/// </summary>
 	void SetBuildMode_T() {
-		bool buildModeIsInstalledObject = false;
-		bool buildModeIsLooseObject = false;
+		buildModeIsInstalledObject = false;
+		buildModeIsLooseObject = false;
 	}
 
 	// Why isn't this included in the base language?
