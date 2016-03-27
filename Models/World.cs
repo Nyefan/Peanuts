@@ -16,6 +16,7 @@ public class World {
 
 	static Dictionary<string, InstalledObject> installedObjectPrototypes;
 	Action<InstalledObject> cb_InstalledObjectCreated;
+	Action<InstalledObject> cb_InstalledObjectDestroyed;
 
 	/// <summary>
 	/// Gets or sets the width.
@@ -50,20 +51,10 @@ public class World {
 
 	}
 
-	// TODO: Set this up to read from an XML file (or some other data file)
-	void CreateInstalledObjectPrototypes() {
-		installedObjectPrototypes = new Dictionary<string, InstalledObject> ();
-
-		//Temporary code for figuring out how to structure everything
-		InstalledObject treesPrototype = InstalledObject.CreatePrototype("Trees", 0, 1, 1);
-		installedObjectPrototypes.Add ("Trees", treesPrototype);
-		Debug.Log ("InstalledObjectPrototype dictionary populated");
-	}
-
 	// TODO: this currently assumes 1x1 objects - fix that
 	public void PlaceInstalledObject(string objectType, Tile baseTile) {
-		if (!installedObjectPrototypes.ContainsKey(objectType)) {
-			Debug.LogError("MouseController.SetTilePainter_IO - The InstalledObject \"" + objectType + "\" has no prototype.");
+		if (!installedObjectPrototypes.ContainsKey (objectType)) {
+			Debug.LogError ("MouseController.SetTilePainter_IO - The InstalledObject \"" + objectType + "\" has no prototype.");
 			return;
 		}
 
@@ -71,6 +62,24 @@ public class World {
 
 		if(cb_InstalledObjectCreated != null) {
 			cb_InstalledObjectCreated (io);
+		}
+	}
+
+
+	public void RemoveInstalledObject(Tile baseTile) {
+		InstalledObject io = baseTile.InstalledObject;
+
+		if (io == null) { 
+			Debug.Log ("Tried to remove InstalledObject from a Tile ("+baseTile.X+", "+baseTile.Y+") that doesn't have one.");
+			return;
+		}
+
+		if(cb_InstalledObjectDestroyed != null) {
+			cb_InstalledObjectDestroyed (io);
+		}
+
+		foreach (var tile in io.Tiles) {
+			tile.InstalledObject = null;
 		}
 	}
 
@@ -100,11 +109,33 @@ public class World {
 		return tiles [x, y];
 	}
 
+	// Callback functions
+
 	public void RegisterCB_OnInstalledObjectCreated( Action<InstalledObject> cbfun ) {
 		cb_InstalledObjectCreated += cbfun;
 	}
 
 	public void UnregisterCB_OnInstalledObjectCreated( Action<InstalledObject> cbfun ) {
 		cb_InstalledObjectCreated -= cbfun;
+	}
+
+	public void RegisterCB_OnInstalledObjectDestroyed( Action<InstalledObject> cbfun ) {
+		cb_InstalledObjectDestroyed += cbfun;
+	}
+
+	public void UnregisterCB_OnInstalledObjectDestroyed( Action<InstalledObject> cbfun ) {
+		cb_InstalledObjectDestroyed -= cbfun;
+	}
+
+	// Internal Functions
+
+	// TODO: Set this up to read from an XML file (or some other data file)
+	void CreateInstalledObjectPrototypes() {
+		installedObjectPrototypes = new Dictionary<string, InstalledObject> ();
+
+		//Temporary code for figuring out how to structure everything
+		InstalledObject treesPrototype = InstalledObject.CreatePrototype("Trees", 0, 1, 1);
+		installedObjectPrototypes.Add ("Trees", treesPrototype);
+		Debug.Log ("InstalledObjectPrototype dictionary populated");
 	}
 }

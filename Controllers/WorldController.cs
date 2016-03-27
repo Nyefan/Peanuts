@@ -47,7 +47,8 @@ public class WorldController : MonoBehaviour {
 
 		// Make a new map
 		World = new World();
-		World.RegisterCB_OnInstalledObjectCreated ( OnInstalledObjectCreated );
+		World.RegisterCB_OnInstalledObjectCreated (OnInstalledObjectCreated);
+		World.RegisterCB_OnInstalledObjectDestroyed (OnInstalledObjectDestroyed);
 
 
 		// Instantiate the currentLayer Dictionary
@@ -152,6 +153,23 @@ public class WorldController : MonoBehaviour {
 
 	void OnInstalledObjectStateChanged(InstalledObject io_data) {
 		Debug.LogError ("OnInstalledObjectStateChanged - NOT IMPLEMENTED.");
+	}
+
+	void OnInstalledObjectDestroyed(InstalledObject io_data) {
+		if ( !map_InstalledObject2GameObject.ContainsKey(io_data) ) {
+			Debug.LogError ("Tried to destroy an InstalledObject that doesn't exist - this should never happen.");
+			return;
+		}
+
+		// Destroy the visual representation of the InstalledObject
+		Destroy (map_InstalledObject2GameObject [io_data]);
+
+		// Remove the record of the InstalledObject
+		map_InstalledObject2GameObject.Remove (io_data);
+
+
+		io_data.UnregisterCB_OnStateChanged (OnInstalledObjectStateChanged);
+		io_data = null;
 	}
 
 	// Internal Functions

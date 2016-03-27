@@ -148,11 +148,14 @@ public class InstalledObject {
 				// These lines are separate to add sanity checks and pathing requirements later
 				Tile t = baseTile.World.GetTileAt (baseTile.X + w, baseTile.Y + h);
 				io.Tiles.Add (t);
+				// This should be sufficient to handle multi-tile objects,
+				// though it may not make sense to handle that here
+				t.InstalledObject = io;
 			}
 		}
 
 		//io.tiles.ElementAt (0).installedObject = io;
-		baseTile.InstalledObject = io;
+		//baseTile.InstalledObject = io;
 
 		return io;
 	}

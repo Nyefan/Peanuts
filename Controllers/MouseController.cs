@@ -121,7 +121,11 @@ public class MouseController : MonoBehaviour {
 					Tile t = WorldController.Instance.World.GetTileAt (x, y);
 					if(t != null) { 
 						if (buildModeIsInstalledObject) {
-							WorldController.Instance.World.PlaceInstalledObject (buildModeType_IO, t);
+							if (buildModeType_IO == null) {
+								WorldController.Instance.World.RemoveInstalledObject (t);
+							} else {
+								WorldController.Instance.World.PlaceInstalledObject (buildModeType_IO, t);
+							}
 						} else if (buildModeIsLooseObject) {
 							
 						} else {
@@ -189,6 +193,7 @@ public class MouseController : MonoBehaviour {
 
 	public void SetTilePainter_IO(string objectType) {
 		SetBuildMode_IO ();
+		if (objectType.Equals("")) { objectType = null; }
 		buildModeType_IO = objectType;
 	}
 

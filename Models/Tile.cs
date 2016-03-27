@@ -56,6 +56,7 @@ public class Tile  {
 		set {
 			if(value == null) {
 				Debug.Log ("Removed InstalledObject " + io.ObjectType + " from Tile " + X + ", " + Y + ".");
+				io = null;
 			} else if (io != null) {
 				Debug.LogWarning ("Tried to place InstalledObject" + value.ObjectType + " in a Tile that already has an installedObject.");
 			} else {
