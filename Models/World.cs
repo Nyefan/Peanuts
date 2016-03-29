@@ -60,6 +60,9 @@ public class World {
 
 		InstalledObject io = InstalledObject.PlaceInstance (installedObjectPrototypes[objectType], baseTile);
 
+		// Bail out if PlaceInstance didn't work (fixes bug where sprites would be placed even for objects that were rejected)
+		if (io == null) { return; }
+
 		if(cb_InstalledObjectCreated != null) {
 			cb_InstalledObjectCreated (io);
 		}

@@ -130,6 +130,16 @@ public class InstalledObject {
 	/// <param name="baseTile">The bottom left tile onto which this object is to be installed. </param>
 	public static InstalledObject PlaceInstance( InstalledObject prototype, Tile baseTile ) {
 
+		// Check to make sure that there isn't an InstalledObject already here
+		for (int h = 0; h < prototype.Height; h++) {
+			for (int w = 0; w < prototype.Width; w++) {
+				if(baseTile.World.GetTileAt(baseTile.X + w, baseTile.Y + h).InstalledObject != null) {
+					return null;
+				}
+			}
+		}
+
+
 		InstalledObject io = new InstalledObject ();
 
 		// TODO: Consider whether it makes more sense to link these values to the prototype directly rather than to make copies.
