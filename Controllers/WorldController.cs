@@ -10,19 +10,6 @@ public class WorldController : MonoBehaviour {
 	/// </summary>
 	public static WorldController Instance { get; protected set; }
 
-	//TODO: Load these at runtime;
-	public Sprite sp_Empty; 
-	public Sprite sp_Water;
-	public Sprite sp_Grass;
-	public Sprite sp_Desert;
-	public Sprite sp_Plains;
-	public Sprite sp_Rough;
-	public Sprite sp_Lava;
-	public Sprite sp_Snow;
-	public Sprite sp_Marsh;
-
-	public Sprite sp_Trees;
-
 	/// <summary>
 	/// Gets or sets the world.
 	/// </summary>
@@ -37,6 +24,8 @@ public class WorldController : MonoBehaviour {
 	/// The map of currently existing InstalledObjects to their associated GameObjects used for rendering.
 	/// </summary>
 	Dictionary<InstalledObject, GameObject> map_InstalledObject2GameObject;
+
+	Dictionary<string, Sprite> map_SpriteName2Sprite;
 
 	// Use this for initialization
 	void Start () {
@@ -54,6 +43,10 @@ public class WorldController : MonoBehaviour {
 		// Instantiate the currentLayer Dictionary
 		map_Tile2GameObject = new Dictionary<Tile, GameObject> ();
 		map_InstalledObject2GameObject = new Dictionary<InstalledObject, GameObject> ();
+		map_SpriteName2Sprite = new Dictionary<string, Sprite> ();
+
+		// Load all the sprites into the dictionary
+		LoadSprites ();
 
 		// Create a GameObject for each Tile
 		InstantiateTiles ();
@@ -105,26 +98,28 @@ public class WorldController : MonoBehaviour {
 			return;
 		}
 			
-		//TODO: switch case
+		//TODO: make this dynamic based on a string passed by the button
+		//      empty tiles should still have a null sprite, but
+		//      filled tiles with unrecognized types should have a recognizeable default texture
 		// Change the Tile's GameObject to render the correct sprite for the TileType
 		if (tile_data.Type == Tile.TileType.Empty) {
 			tile_go.GetComponent<SpriteRenderer> ().sprite = null;
 		} else if (tile_data.Type == Tile.TileType.Water) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Water;
+			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Water"];
 		} else if (tile_data.Type == Tile.TileType.Grass) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Grass;
+			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Grass"];
 		} else if (tile_data.Type == Tile.TileType.Desert) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Desert;
+			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Desert"];
 		} else if (tile_data.Type == Tile.TileType.Plains) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Plains;
+			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Plains"];
 		} else if (tile_data.Type == Tile.TileType.Rough) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Rough;
+			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Rough"];
 		} else if (tile_data.Type == Tile.TileType.Lava) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Lava;
+			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Lava"];
 		} else if (tile_data.Type == Tile.TileType.Snow) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Snow;
+			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Snow"];
 		} else if (tile_data.Type == Tile.TileType.Marsh) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = sp_Marsh;
+			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Marsh"];
 		} else {
 			Debug.LogError("WorldController.OnTiletypeChanged - Unrecognized tile type.  The Tile at ("+tile_data.X+","+tile_data.Y+") has defaulted to empty.");
 			tile_data.Type = Tile.TileType.Empty;
@@ -144,7 +139,7 @@ public class WorldController : MonoBehaviour {
 		io_go.transform.position = new Vector3 ( io_data.Tiles.First().X, io_data.Tiles.First().Y );
 		io_go.transform.SetParent (this.transform, true);
 
-		io_go.AddComponent<SpriteRenderer>().sprite = sp_Trees;
+		io_go.AddComponent<SpriteRenderer>().sprite = map_SpriteName2Sprite ["sp_IO_Trees"];
 
 		io_data.RegisterCB_OnStateChanged(OnInstalledObjectStateChanged);
 
@@ -197,6 +192,18 @@ public class WorldController : MonoBehaviour {
 
 				map_Tile2GameObject.Add (tile_data, tile_go);
 			}
+		}
+	}
+
+	void LoadSprites() {
+		Sprite[] sp_Terrain = Resources.LoadAll<Sprite>("Terrain");
+		foreach (var sprite in sp_Terrain) {
+			map_SpriteName2Sprite.Add ("sp_" + "Terrain_" + sprite.name, sprite);
+		}
+
+		Sprite[] sp_InstalledObjects = Resources.LoadAll<Sprite>("Misc");
+		foreach (var sprite in sp_InstalledObjects) {
+			map_SpriteName2Sprite.Add ("sp_" + "IO_" + sprite.name, sprite);
 		}
 	}
 }
