@@ -1,17 +1,26 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public class Tile  {
 
+
+	// There's got to be a more elegant way to do this
 	/// <summary>
 	/// Available base terrain types.
 	/// </summary>
-	public enum TileType                           { Empty, Water, Grass, Desert, Plains, Rough, Lava, Snow, Marsh };
-	/// <summary>
-	/// The base move cost of each terrain type.
-	/// </summary>
-	static List<float> moveCost = new List<float>(){     0,    5f,    1f,   1.2f,   1.2f,  1.5f,   2f,   2f,    2f };
+	public static Dictionary<string, float> TileType  = new Dictionary<string, float> {
+		{"Empty",  0f},
+		{"Water",  5f},
+		{"Grass",  1f},
+		{"Desert", 1.2f},
+		{"Plains", 1.2f},
+		{"Rough",  1.5f},
+		{"Lava",   2f},
+		{"Snow",   2f},
+		{"Marsh",  2f}
+	};
 
 	/// <summary>
 	/// Container for callback functions that should be called when the tile type changes
@@ -22,17 +31,17 @@ public class Tile  {
 	/// <summary>
 	/// The base terrain type of the tile.
 	/// </summary>
-	TileType type = TileType.Empty;
+	string type = TileType.Keys.ElementAt (0);
 
 	/// <summary>
 	/// Gets or sets the base terrain type of the Tile.  If any render layer modifications need to be made as a 
 	/// result of changing this value, they should be registered as a callback function
 	/// </summary>
 	/// <value>The type.</value>
-	public TileType Type {
+	public string Type {
 		get { return type; }
 		set { 
-			TileType old = type;
+			string old = type;
 			type = value; 
 			if (cb_TileTypeChanged != null && old != type) {
 				cb_TileTypeChanged (this);
@@ -46,7 +55,7 @@ public class Tile  {
 	/// handled by the caller.
 	/// </summary>
 	/// <value>The move cost.</value>
-	public float MoveCost { get { return moveCost[(int)type]; } }
+	public float MoveCost { get { return TileType[Type]; } }
 
 	public InterractableObject InterractableObject { get; set; }
 

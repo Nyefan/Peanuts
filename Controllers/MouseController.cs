@@ -18,13 +18,13 @@ public class MouseController : MonoBehaviour {
 	/// <summary>
 	/// The current TileType to be painted while in build mode.  Defaults to Grass.
 	/// </summary>
-	Tile.TileType buildModeType_Tile = Tile.TileType.Grass;
+	string buildModeType_Tile = Tile.TileType.Keys.ElementAt (0);
 	string buildModeType_IO = null;
 
 
 	// Camera positions used for dragging and selecting objects
-	Vector3 lastFramePosition;
-	Vector3 currentFramePosition;
+	Vector3 lastFrameCursorPosition;
+	Vector3 currentFrameCursorPosition;
 
 	/// <summary>
 	/// The point at which the mouse was originally clicked when dragging in build mode.
@@ -53,14 +53,14 @@ public class MouseController : MonoBehaviour {
 	/// Update this instance - called once per frame.
 	/// </summary>
 	void Update () {
-		currentFramePosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-		currentFramePosition.z = 0;
+		currentFrameCursorPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+		currentFrameCursorPosition.z = 0;
 
 		UpdateDragging ();
 		UpdateCamera ();
 
-		lastFramePosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
-		lastFramePosition.z = 0;
+		lastFrameCursorPosition = Camera.main.ScreenToWorldPoint (Input.mousePosition);
+		lastFrameCursorPosition.z = 0;
 	}
 
 	//TODO: once editor and gameplay modes are separate, check for the editor flag before doing anything
@@ -81,14 +81,14 @@ public class MouseController : MonoBehaviour {
 				noDragFlag = false; 
 			} 
 
-			bandSelectionBoxStartPosition = currentFramePosition;
+			bandSelectionBoxStartPosition = currentFrameCursorPosition;
 		}
 
 		// Figure out the bounds of the selection box
 		int start_x = Mathf.FloorToInt (bandSelectionBoxStartPosition.x + 0.5f);
 		int start_y = Mathf.FloorToInt (bandSelectionBoxStartPosition.y + 0.5f);
-		int end_x = Mathf.FloorToInt (currentFramePosition.x + 0.5f);
-		int end_y = Mathf.FloorToInt (currentFramePosition.y + 0.5f);
+		int end_x = Mathf.FloorToInt (currentFrameCursorPosition.x + 0.5f);
+		int end_y = Mathf.FloorToInt (currentFrameCursorPosition.y + 0.5f);
 		if (start_x > end_x) { Swap (ref start_x, ref end_x); }
 		if (start_y > end_y) { Swap (ref start_y, ref end_y); }
 
@@ -142,7 +142,7 @@ public class MouseController : MonoBehaviour {
 	/// </summary>
 	void UpdateCamera () {
 		if (Input.GetMouseButton(2)) { // 2 = middle mouse button
-			Vector3 diff = lastFramePosition - currentFramePosition;
+			Vector3 diff = lastFrameCursorPosition - currentFrameCursorPosition;
 			Camera.main.transform.Translate (diff);
 		}
 
@@ -154,41 +154,9 @@ public class MouseController : MonoBehaviour {
 	// Available types are: Empty, Water, Grass, Desert, Plains, Rough, Lava, Snow, Marsh
 	// TODO: Probably should change this to take advantage of the underlying enumeration, 
 	//	     but that allows the render layer to dictate the behaviour of the model layer
-	public void SetTilePainter_Empty() { 
+	public void SetTilePainter_T(string tileType) {
 		SetBuildMode_T ();
-		buildModeType_Tile = Tile.TileType.Empty; 
-	}
-	public void SetTilePainter_Water() { 
-		SetBuildMode_T ();
-		buildModeType_Tile = Tile.TileType.Water; 
-	}
-	public void SetTilePainter_Grass() { 
-		SetBuildMode_T ();
-		buildModeType_Tile = Tile.TileType.Grass; 
-	}
-	public void SetTilePainter_Desert() { 
-		SetBuildMode_T ();
-		buildModeType_Tile = Tile.TileType.Desert; 
-	}
-	public void SetTilePainter_Plains() { 
-		SetBuildMode_T ();
-		buildModeType_Tile = Tile.TileType.Plains; 
-	}
-	public void SetTilePainter_Rough() { 
-		SetBuildMode_T ();
-		buildModeType_Tile = Tile.TileType.Rough; 
-	}
-	public void SetTilePainter_Lava() { 
-		SetBuildMode_T ();
-		buildModeType_Tile = Tile.TileType.Lava; 
-	}
-	public void SetTilePainter_Snow() { 
-		SetBuildMode_T ();
-		buildModeType_Tile = Tile.TileType.Snow; 
-	}
-	public void SetTilePainter_Marsh() { 
-		SetBuildMode_T ();
-		buildModeType_Tile = Tile.TileType.Marsh; 
+		buildModeType_Tile = tileType;
 	}
 
 	public void SetTilePainter_IO(string objectType) {

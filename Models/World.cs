@@ -92,7 +92,7 @@ public class World {
 	/// </summary>
 	public void InitializeTiles() {
 		foreach (var tile in tiles) {
-			tile.Type = Tile.TileType.Grass;
+			tile.Type = "Grass";
 		}
 	}
 

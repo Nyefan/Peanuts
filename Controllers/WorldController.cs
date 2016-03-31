@@ -98,34 +98,15 @@ public class WorldController : MonoBehaviour {
 			return;
 		}
 			
-		//TODO: make this dynamic based on a string passed by the button
-		//      empty tiles should still have a null sprite, but
-		//      filled tiles with unrecognized types should have a recognizeable default texture
-		// Change the Tile's GameObject to render the correct sprite for the TileType
-		if (tile_data.Type == Tile.TileType.Empty) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = null;
-		} else if (tile_data.Type == Tile.TileType.Water) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Water"];
-		} else if (tile_data.Type == Tile.TileType.Grass) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Grass"];
-		} else if (tile_data.Type == Tile.TileType.Desert) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Desert"];
-		} else if (tile_data.Type == Tile.TileType.Plains) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Plains"];
-		} else if (tile_data.Type == Tile.TileType.Rough) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Rough"];
-		} else if (tile_data.Type == Tile.TileType.Lava) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Lava"];
-		} else if (tile_data.Type == Tile.TileType.Snow) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Snow"];
-		} else if (tile_data.Type == Tile.TileType.Marsh) {
-			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_Marsh"];
+		//TODO: filled tiles with unrecognized types should have a recognizeable default texture
+		if (!Tile.TileType.ContainsKey (tile_data.Type)) {
+			string defaultTileType = Tile.TileType.Keys.ElementAt (0);
+			Debug.LogError("WorldController.OnTiletypeChanged - Unrecognized tile type.  The Tile at ("+tile_data.X+","+tile_data.Y+") has been defaulted to " + defaultTileType);
+			tile_data.Type = defaultTileType;
 		} else {
-			Debug.LogError("WorldController.OnTiletypeChanged - Unrecognized tile type.  The Tile at ("+tile_data.X+","+tile_data.Y+") has defaulted to empty.");
-			tile_data.Type = Tile.TileType.Empty;
-			//This line shouldn't be necessary unless the callback system is changed
-			//tile_go.GetComponent<SpriteRenderer> ().sprite = null;
+			tile_go.GetComponent<SpriteRenderer> ().sprite = map_SpriteName2Sprite ["sp_Terrain_" + tile_data.Type];
 		}
+
 	}
 
 	void OnInstalledObjectCreated(InstalledObject io_data) {
@@ -200,6 +181,8 @@ public class WorldController : MonoBehaviour {
 		foreach (var sprite in sp_Terrain) {
 			map_SpriteName2Sprite.Add ("sp_" + "Terrain_" + sprite.name, sprite);
 		}
+		// Allow empty to default to null without having to check for it everywhere
+		map_SpriteName2Sprite.Add ("sp_Terrain_Empty", null);
 
 		Sprite[] sp_InstalledObjects = Resources.LoadAll<Sprite>("Misc");
 		foreach (var sprite in sp_InstalledObjects) {
